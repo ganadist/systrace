@@ -1,0 +1,8 @@
+android의 systrace를 데스크탑/서버용으로 만들었습니다.
+
+DONE:
+  ext4 및 block request parser 추가
+
+TODO:
+  userspace support library 추가
+  policykit 연동

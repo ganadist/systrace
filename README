@@ -1,0 +1,8 @@
+This is systrace script for Linux Desktop/Server
+
+DONE:
+  add ext4/block request parser from old systrace
+
+TODO:
+  add userspace support library
+  integrate with policykit
