@@ -110,7 +110,8 @@ def startTrace(options):
     setGovernor(True)
     setTraceBufferSize(options.trace_buf_size)
     setGlobalClock(True)
-    setGpu(True)
+    if options.trace_gpu:
+        setGpu(True)
 
     isRoot = True
 
@@ -262,6 +263,8 @@ if __name__ == '__main__':
     parser.add_option('-w', '--workqueue', dest='trace_workqueue', default=False,
                     action='store_true', help='trace the kernel workqueues ' +
                     '(requires root)')
+    parser.add_option('-g', '--gpu', dest='trace_gpu', default=False,
+                    action='store_true', help='trace GPU events')
 
     options, args = parser.parse_args()
 
