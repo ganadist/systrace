@@ -1,0 +1,5 @@
+You must set permission for using userspace library
+
+---
+/bin/chmod o+x /sys/kernel/debug
+/bin/chmod a+w /sys/kernel/debug/tracing/trace_marker
