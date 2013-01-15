@@ -206,6 +206,7 @@ def sig_handler(sig, frame):
         stopTrace()
         clearTrace()
         setTraceBufferSize(1)
+        sys.exit(0)
 
 def check_environment():
     if not os.access(TRACE_DIR, os.X_OK):
