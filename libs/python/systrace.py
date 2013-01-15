@@ -4,45 +4,52 @@ import os
 
 __all__ = ["traceBegin", "traceEnd", "Trace", "trace"]
 
-__TRACE_MARKER = '/sys/kernel/debug/tracing/trace_marker'
+_TRACE_MARKER = '/sys/kernel/debug/tracing/trace_marker'
+_USE_TRACE = os.environ.get('ENABLE_SYSTRACE', '0') == '1'
 
-if os.access(__TRACE_MARKER, os.W_OK):
-    __TRACE_FILE = open(__TRACE_MARKER, 'w')
-    __PID = str(os.getpid())
+if _USE_TRACE and os.access(_TRACE_MARKER, os.W_OK):
+    _TRACE_FD = os.open(_TRACE_MARKER, os.O_WRONLY)
+else:
+    _USE_TRACE = False
+
+if _USE_TRACE:
+    import ctypes
+    libc = ctypes.CDLL('libc.so.6')
+    _sys_write = libc.write
+    _STARTMARK = '|'.join(('B', str(os.getpid()), ''))
     def traceBegin(name):
-        buf = '|'.join(('B', __PID, name))
-        __TRACE_FILE.write(buf)
-        try:
-            __TRACE_FILE.flush()
-        except IOError:
-            pass
-    
+        buf = _STARTMARK + name
+        _sys_write(_TRACE_FD, buf, len(buf))
+
     def traceEnd():
-        __TRACE_FILE.write('E')
-        try:
-            __TRACE_FILE.flush()
-        except IOError:
-            pass
+        _sys_write(_TRACE_FD, 'E', 1)
+
+    class Trace:
+        def __init__(self, name):
+            traceBegin(name)
+        def __del__(self):
+            traceEnd()
+
 else:
     traceBegin = lambda name: None 
     traceEnd = lambda: None
-
-class Trace:
-    def __init__(self, name):
-        traceBegin(name)
-    def __del__(self):
-        traceEnd()
+    Trace = lambda name: None
 
 class trace:
     def __init__(self, name = ''):
         self.name = name
 
     def __call__(self, func):
+        if not _USE_TRACE:
+            return func
+
         if not self.name:
             self.name = func.__name__
-        def wrapper(*args):
-            t = Trace(self.name)
-            return func(*args)
+        def wrapper(*args, **kwds):
+            traceBegin(self.name)
+            r = func(*args, **kwds)
+            traceEnd()
+            return r
         return wrapper
 
 def main():
