@@ -1,7 +1,7 @@
 target: all
 all: libtrace.a trace_test
 
-CFLAGS := -Wall -pthread
+CFLAGS := -Os -fPIC -Wall -pthread
 
 libtrace.a: trace.o
 	$(AR) r $@ $^
