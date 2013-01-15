@@ -16,9 +16,8 @@ if _USE_TRACE:
     import ctypes
     libc = ctypes.CDLL('libc.so.6')
     _sys_write = libc.write
-    _STARTMARK = '|'.join(('B', str(os.getpid()), ''))
     def traceBegin(name):
-        buf = _STARTMARK + name
+        buf = '|'.join(('B', str(os.getpid()), name))
         _sys_write(_TRACE_FD, buf, len(buf))
 
     def traceEnd():
