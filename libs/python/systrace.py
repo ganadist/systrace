@@ -35,11 +35,12 @@ else:
     Trace = lambda name: None
 
 class trace:
-    def __init__(self, name = ''):
+    def __init__(self, name = '', enable = lambda: _USE_TRACE):
         self.name = name
+        self.enable = enable
 
     def __call__(self, func):
-        if not _USE_TRACE:
+        if not self.enable():
             return func
 
         if not self.name:
